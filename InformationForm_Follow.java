@@ -126,14 +126,10 @@ public class InformationForm_Follow extends JDialog {
         JPanel p3_search = new JPanel();
         p3_search.setPreferredSize(new Dimension(600, 50));
         p3_search.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        JTextField t3_s = new JTextField(20);
-        JButton b3_s = new JButton("Search");
         
         Follower = new JButton("Follower");
         Following = new JButton("Following");
         
-        p3_search.add(t3_s);
-        p3_search.add(b3_s);
         p3_search.add(Follower);
         p3_search.add(Following);
         

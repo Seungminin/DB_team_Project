@@ -3,9 +3,12 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
@@ -22,19 +25,52 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+
+/*
+ * //Table 생성
+    public static void createTable(){
+        try{
+            Connection con = getConnection();
+            PreparedStatement create = con.prepareStatement(
+                    "CREATE TABLE IF NOT EXISTS "
+                    + "customer(id int NOT NULL AUTO_INCREMENT,"
+                    + "name varChar(255),"
+                    + "author varChar(255),"
+                    + "booknumber varChar(255),"
+                    + "publisher varChar(255),"
+                    + "category varChar(255),"
+                    + "introduction varChar(255),"
+                    + "PRIMARY KEY(id))");
+            create.execute();
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }finally{
+            System.out.println("Table successfully created");
+        }
+    } 이런 느낌으로 테이블을 만든다.
+ * */
 public class InformationForm extends JDialog {
     private LoginForm owner;
     private UserDataSet users;
 
     private JoinForm joinForm;
     
+    private Container cp;
+    private JPanel p2_main;
     //Logout, 회원탈퇴를 하는 것
     private JButton btnLogout;
     private JButton btnWithdraw;
     
+    //Search Button
+    private JButton b3_s;
+    private JTextField search;
+    private JButton Back;
+    private JPanel currPanel;
+    private JPanel SearchPanel;
     //Follower, Following을 보는 버튼
     private JButton Follower;
     private JButton Following;
@@ -97,6 +133,8 @@ public class InformationForm extends JDialog {
     }
 
     private void init() {
+    	  
+    	//
     	//Color지정
         Color c1 = new Color(170, 185, 180); // RGB
         Color c2 = new Color(210, 200, 200);
@@ -112,8 +150,39 @@ public class InformationForm extends JDialog {
         int ypos = (int) (screen.getHeight() / 2 - frm.getHeight() / 2);
         super.setLocation(xpos, ypos);
 
-        Container cp = this.getContentPane(); // Use "this" instead of creating a new JFrame
+        cp = this.getContentPane(); // Use "this" instead of creating a new JFrame
 
+        //Search 버튼을 눌렀을 때 바뀌는 Panel 초기화, Search Panel 만들기
+        SearchPanel = new JPanel();
+        SearchPanel.setBounds(0, 0, 787, 700);
+        SearchPanel.setVisible(false);
+        SearchPanel.setLayout(null);
+        SearchPanel.setBackground(c2);
+        
+        /* JTable table = new JTable(data, headers);
+         table.setRowHeight(30);
+         table.setFont(new Font("Sanserif",  Font.BOLD, 15));
+         table.setAlignmentX(0);
+         table.setSize(600,400);
+         table.setPreferredScrollableViewportSize(new Dimension(600,400));
+         JScrollPane scrollPane = new JScrollPane(table);
+         scrollPane.setBounds(219, 24, 556, 305);
+         SearchPanel.add(scrollPane);
+         cp.add(SearchPanel);*/
+        Back = new JButton("Back");
+        Back.setBounds(10, 10, 100, 30);  // 적절한 위치와 크기로 조절
+        SearchPanel.add(Back);
+        
+        search = new JTextField();
+        search.setHorizontalAlignment(SwingConstants.CENTER);
+        search.setText("\uAC80\uC0C9");
+        search.setFont(new Font("나눔고딕", Font.BOLD, 25));
+        search.setBounds(193, 650, 300, 30);
+        SearchPanel.add(search);
+        search.setColumns(10);
+        
+        cp.add(SearchPanel);
+        
         JPanel p1_up = new JPanel();
         p1_up.setPreferredSize(new Dimension(250, 30));
         p1_up.setBackground(c1);
@@ -122,7 +191,7 @@ public class InformationForm extends JDialog {
         p1_up.add(l1);
         cp.add(p1_up, BorderLayout.NORTH);
 
-        JPanel p2_main = new JPanel();
+        p2_main = new JPanel();
         p2_main.setLayout(null); // null layout으로 설정 -> 개발자가 직접 크기 설정
         p2_main.setBackground(c2);
         
@@ -131,7 +200,7 @@ public class InformationForm extends JDialog {
         p3_search.setPreferredSize(new Dimension(600, 50));
         p3_search.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         JTextField t3_s = new JTextField(20);
-        JButton b3_s = new JButton("Search");
+        b3_s = new JButton("Search");
         
         Follower = new JButton("Follower");
         Following = new JButton("Following");
@@ -245,6 +314,33 @@ public class InformationForm extends JDialog {
                 owner.setVisible(true);
             }
         });
+        
+        b3_s.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                p2_main.setVisible(!p2_main.isVisible());
+                SearchPanel.setVisible(!SearchPanel.isVisible());
+            }
+        });
+
+        Back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                p2_main.setVisible(!p2_main.isVisible());
+                SearchPanel.setVisible(!SearchPanel.isVisible());
+            }
+        });
+        
+        search.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+               /* String val = search.getText();
+                TableRowSorter<TableModel> trs = new TableRowSorter<>(table.getModel());
+                table.setRowSorter(trs);
+                trs.setRowFilter(RowFilter.regexFilter(val));*/
+            	//여기서 데이터베이스 정보를 받아와 table 형식으로 받고 그거를 다시 출력
+            }
+        });
+
         
         Follower.addActionListener(new ActionListener() {
 			

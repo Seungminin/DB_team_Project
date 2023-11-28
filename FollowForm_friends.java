@@ -21,6 +21,10 @@ public class FollowForm_friends extends JDialog implements FollowFormCommon {
     private JLabel lb2;
     private JLabel lb3;
     
+    private JLabel t_lb1;
+    private JLabel t_lb2;
+    private JLabel t_lb3;
+    
     private JButton view1;
     private JButton view2;
     private JButton view3;
@@ -38,6 +42,7 @@ public class FollowForm_friends extends JDialog implements FollowFormCommon {
     public void showInformation() {
         // 공통 동작 구현
     	// 예: InformationForm_Follow를 생성하고 보이게 하는 등의 동작을 추가할 수 있습니다.
+    	dispose();  // Close the current dialog
         InformationForm_Follow infoFollow = new InformationForm_Follow(this);
         infoFollow.setVisible(true);
     }
@@ -57,6 +62,14 @@ public class FollowForm_friends extends JDialog implements FollowFormCommon {
          lb2.setPreferredSize(lblSize);
          lb3 = new JLabel("Name", JLabel.LEFT);
          lb3.setPreferredSize(lblSize);
+         
+         //함께 아는 친구들
+         t_lb1 = new JLabel("together", JLabel.LEFT);
+         t_lb1.setPreferredSize(lblSize);
+         t_lb2 = new JLabel("together", JLabel.LEFT);
+         t_lb2.setPreferredSize(lblSize);
+         t_lb3 = new JLabel("together", JLabel.LEFT);
+         t_lb3.setPreferredSize(lblSize);
          
          view1 = new JButton("View");
          view1.setPreferredSize(btnSize);
@@ -84,14 +97,17 @@ public class FollowForm_friends extends JDialog implements FollowFormCommon {
         JPanel pnlCenter = new JPanel(new GridLayout(3, 0)); // 3열의 그리드 레이아웃
         JPanel f_1 = new JPanel(flowLeft);
         f_1.add(lb1);
+        f_1.add(t_lb1);
         f_1.add(view1);
         
         JPanel f_2 = new JPanel(flowLeft);
         f_2.add(lb2);
+        f_2.add(t_lb2);
         f_2.add(view2);
         
         JPanel f_3 = new JPanel(flowLeft);
         f_3.add(lb3);
+        f_3.add(t_lb3);
         f_3.add(view3);
         
         pnlCenter.add(f_1);

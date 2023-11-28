@@ -26,6 +26,10 @@ public class FollowForm extends JDialog implements FollowFormCommon {
     private JLabel lb2;
     private JLabel lb3;
     
+    private JLabel t_lb1;
+    private JLabel t_lb2;
+    private JLabel t_lb3;
+    
     private JButton view1;
     private JButton delete1;
     private JButton view2;
@@ -45,8 +49,9 @@ public class FollowForm extends JDialog implements FollowFormCommon {
     @Override
     public void showInformation() {
         // 공통 동작 구현
-    	 InformationForm_Follow info_follow = new InformationForm_Follow(FollowForm.this);
-	     info_follow.setVisible(true);
+    	dispose();  // Close the current dialog
+    	InformationForm_Follow info_follow = new InformationForm_Follow(FollowForm.this);
+	    info_follow.setVisible(true);
     }
 
     private void init() {
@@ -64,6 +69,14 @@ public class FollowForm extends JDialog implements FollowFormCommon {
          lb2.setPreferredSize(lblSize);
          lb3 = new JLabel("Name", JLabel.LEFT);
          lb3.setPreferredSize(lblSize);
+         
+         //함께아는 친구
+         t_lb1 = new JLabel("together", JLabel.LEFT);
+         t_lb1.setPreferredSize(lblSize);
+         t_lb2 = new JLabel("together", JLabel.LEFT);
+         t_lb2.setPreferredSize(lblSize);
+         t_lb3 = new JLabel("together", JLabel.LEFT);
+         t_lb3.setPreferredSize(lblSize);
          
          view1 = new JButton("View");
          view1.setPreferredSize(btnSize);
@@ -97,16 +110,19 @@ public class FollowForm extends JDialog implements FollowFormCommon {
         JPanel pnlCenter = new JPanel(new GridLayout(3, 0)); // 3열의 그리드 레이아웃
         JPanel f_1 = new JPanel(flowLeft);
         f_1.add(lb1);
+        f_1.add(t_lb1);
         f_1.add(view1);
         f_1.add(delete1);
         
         JPanel f_2 = new JPanel(flowLeft);
         f_2.add(lb2);
+        f_2.add(t_lb2);
         f_2.add(view2);
         f_2.add(delete2);
         
         JPanel f_3 = new JPanel(flowLeft);
         f_3.add(lb3);
+        f_3.add(t_lb3);
         f_3.add(view3);
         f_3.add(delete3);
         
