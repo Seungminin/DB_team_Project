@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -18,23 +19,17 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-public class InformationForm extends JDialog {
-    private LoginForm owner;
-    private UserDataSet users;
+public class InformationForm_Follow extends JDialog {
+	private FollowFormCommon owner;
 
     private JoinForm joinForm;
-    
-    //Logout, 회원탈퇴를 하는 것
-    private JButton btnLogout;
-    private JButton btnWithdraw;
-    
+
     //Follower, Following을 보는 버튼
     private JButton Follower;
     private JButton Following;
@@ -81,10 +76,10 @@ public class InformationForm extends JDialog {
     	}
     }
     
-    public InformationForm(LoginForm owner) {
-        super(owner, "information", true);
-        this.owner = owner;
-        users = owner.getUsers();
+    //if FollowForm에서 정보가 왔다면 이거를 사용하고 
+    public InformationForm_Follow(FollowFormCommon owner) {
+    	  super(owner instanceof FollowForm ? (FollowForm) owner : null, "Article", true);
+          this.owner = owner;
         
         posts = new ArrayList<>();
         for (String imagePath : IMAGES) {
@@ -95,7 +90,8 @@ public class InformationForm extends JDialog {
         addListeners();
         showFrame();
     }
-
+    //else FollowForm이 아니라 다른 데에서 상속을 요구하면 여기를 사용한다.
+    //else{}
     private void init() {
     	//Color지정
         Color c1 = new Color(170, 185, 180); // RGB
@@ -118,7 +114,7 @@ public class InformationForm extends JDialog {
         p1_up.setPreferredSize(new Dimension(250, 30));
         p1_up.setBackground(c1);
 
-        JLabel l1 = new JLabel("My Article");
+        JLabel l1 = new JLabel("Follow Article");
         p1_up.add(l1);
         cp.add(p1_up, BorderLayout.NORTH);
 
@@ -196,20 +192,6 @@ public class InformationForm extends JDialog {
         p2_main.add(p4_article,BorderLayout.CENTER);
         cp.add(p2_main, BorderLayout.CENTER);
 
-        JPanel p5_under = new JPanel();
-        p5_under.setPreferredSize(new Dimension(50, 50));
-        p5_under.setBackground(c1);
-
-        btnLogout = new JButton("Logout");
-        btnLogout.setPreferredSize(btnsize);
-        btnWithdraw = new JButton("withdraw");
-        btnWithdraw.setPreferredSize(btnsize);
-
-        p5_under.add(btnLogout,BorderLayout.CENTER);
-        p5_under.add(btnWithdraw,BorderLayout.CENTER);
-
-        cp.add(p5_under, BorderLayout.SOUTH);
-        
         frame.pack();
 		frame.setVisible(true);
     }
@@ -221,49 +203,22 @@ public class InformationForm extends JDialog {
                 dispose();
             }
         });
-
-        btnWithdraw.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                users.withdraw(owner.getTfId());
-                JOptionPane.showMessageDialog(
-                        InformationForm.this,
-                        "회원 정보가 삭제되었습니다. 안녕히가세요."
-                );
-                dispose();
-                owner.setVisible(true);
-            }
-        });
-        btnLogout.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                JOptionPane.showMessageDialog(
-                        InformationForm.this,
-                        "로그아웃 되었습니다."
-                );
-                dispose();
-                owner.setVisible(true);
-            }
-        });
         
         Follower.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				FollowForm follow = new FollowForm(InformationForm.this);
-				follow.setVisible(true);
-			}
-		});
-        
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FollowForm_friends follow_f = new FollowForm_friends(InformationForm_Follow.this);
+                follow_f.setVisible(true);
+            }
+        });
+
         Following.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				FollowForm follow = new FollowForm(InformationForm.this);
-				follow.setVisible(true);
-			}
-		});
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	FollowForm_friends follow_f = new FollowForm_friends(InformationForm_Follow.this);
+                follow_f.setVisible(true);
+            }
+        });
         
         comment_btn.addActionListener(new ActionListener() {
             @Override
@@ -336,7 +291,7 @@ public class InformationForm extends JDialog {
 
     private void showFrame() {
         pack();
-        setLocationRelativeTo(owner);
+        setLocationRelativeTo((Component) owner);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
       //  setVisible(true); // Added to make the dialog visible
