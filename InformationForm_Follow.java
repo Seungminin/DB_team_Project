@@ -25,6 +25,8 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import InformationForm.Post;
+
 public class InformationForm_Follow extends JDialog {
 	private FollowFormCommon owner;
 
@@ -43,6 +45,8 @@ public class InformationForm_Follow extends JDialog {
     private JLabel lbimage;
     private JButton btnPrev;
     private JButton btnNext;
+    private JLabel Post_lb;
+    
     
     private List<Post> posts;
     
@@ -55,25 +59,37 @@ public class InformationForm_Follow extends JDialog {
     
     //Post Class는 image마다 comment를 저장해주고, image에 Comment기능을 넣어주는 Class 
     private static class Post {
-    	private String imagePath;
-    	private List<String> comments;
-    	
-    	public Post(String imagePath) {
-    		this.imagePath = imagePath;
-    		this.comments = new ArrayList<>();
-    	}
-    	
-    	public String getImagePath() {
-    		return imagePath;
-    	}
-    	
-    	public List<String> getComments() {
-    		return comments;
-    	}
-    	
-    	public void addComment(String comment) {
-    		comments.add(comment);
-    	}
+        private String imagePath;
+        private String postText;
+        private String originalPostText; // New field for original post text
+        private List<String> comments;
+
+        public Post(String imagePath, String postText) {
+            this.imagePath = imagePath;
+            this.postText = postText;
+            this.originalPostText = postText; // Initialize original post text
+            this.comments = new ArrayList<>();
+        }
+
+        public String getImagePath() {
+            return imagePath;
+        }
+
+        public String getPostText() {
+            return postText;
+        }
+
+        public String getOriginalPostText() {
+            return originalPostText;
+        }
+
+        public List<String> getComments() {
+            return comments;
+        }
+
+        public void addComment(String comment) {
+            comments.add(comment);
+        }
     }
     
     //if FollowForm에서 정보가 왔다면 이거를 사용하고 
@@ -81,10 +97,10 @@ public class InformationForm_Follow extends JDialog {
     	  super(owner instanceof FollowForm ? (FollowForm) owner : null, "Article", true);
           this.owner = owner;
         
-        posts = new ArrayList<>();
-        for (String imagePath : IMAGES) {
-            posts.add(new Post(imagePath));
-        }
+          posts = new ArrayList<>();
+          posts.add(new Post(IMAGES[0], "Post 1 Text"));
+          posts.add(new Post(IMAGES[1], "Post 2 Text"));
+          posts.add(new Post(IMAGES[2], "Post 3 Text"));
 
         init();
         addListeners();
@@ -151,6 +167,17 @@ public class InformationForm_Follow extends JDialog {
         
         PostPanel.setBounds(0, 50, 600, 400);
         PostPanel.add(lbimage);
+        
+        JPanel PostPanel_type = new JPanel();
+        PostPanel_type.setPreferredSize(new Dimension(100,50));
+        PostPanel_type.setLayout(new FlowLayout(FlowLayout.LEFT));
+        Post_lb = new JLabel();
+        
+        PostPanel_type.add(Post_lb);
+        
+        PostPanel_type.setBounds(0, 300, 600, 50);  // PostPanel의 SOUTH로 이동
+        PostPanel.add(PostPanel_type, BorderLayout.SOUTH);
+        
         //버튼
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnPrev = new JButton("Prev");
@@ -256,6 +283,16 @@ public class InformationForm_Follow extends JDialog {
         Post currentPost = posts.get(index);
         lbimage.setIcon(new ImageIcon(currentPost.getImagePath()));
         updateComments(currentPost.getComments());
+
+        // Update Post_lb with post text and comments
+        String postText = currentPost.getOriginalPostText();
+        StringBuilder postInfo = new StringBuilder(postText + "\nComments:\n");
+
+        for (String comment : currentPost.getComments()) {
+            postInfo.append(comment).append("\n");
+        }
+
+        Post_lb.setText(postInfo.toString());
     }
     
     private void updateComments(List<String> comments) {

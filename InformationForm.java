@@ -80,10 +80,14 @@ public class InformationForm extends JDialog {
     private JTextField comment_tf;
     private JTextArea taCheck;
     
-    //이미지를 이동하는 것
+    //이미지를 이동하는 것, 본인의 게시글을 작성하는 것.
     private JLabel lbimage;
     private JButton btnPrev;
     private JButton btnNext;
+    private JLabel Post_lb;
+    private JTextField Post_tf;
+    private JButton Post_bt;
+    private String originalPostText;
     
     private List<Post> posts;
     
@@ -96,25 +100,37 @@ public class InformationForm extends JDialog {
     
     //Post Class는 image마다 comment를 저장해주고, image에 Comment기능을 넣어주는 Class 
     private static class Post {
-    	private String imagePath;
-    	private List<String> comments;
-    	
-    	public Post(String imagePath) {
-    		this.imagePath = imagePath;
-    		this.comments = new ArrayList<>();
-    	}
-    	
-    	public String getImagePath() {
-    		return imagePath;
-    	}
-    	
-    	public List<String> getComments() {
-    		return comments;
-    	}
-    	
-    	public void addComment(String comment) {
-    		comments.add(comment);
-    	}
+        private String imagePath;
+        private String postText;
+        private String originalPostText; // New field for original post text
+        private List<String> comments;
+
+        public Post(String imagePath, String postText) {
+            this.imagePath = imagePath;
+            this.postText = postText;
+            this.originalPostText = postText; // Initialize original post text
+            this.comments = new ArrayList<>();
+        }
+
+        public String getImagePath() {
+            return imagePath;
+        }
+
+        public String getPostText() {
+            return postText;
+        }
+
+        public String getOriginalPostText() {
+            return originalPostText;
+        }
+
+        public List<String> getComments() {
+            return comments;
+        }
+
+        public void addComment(String comment) {
+            comments.add(comment);
+        }
     }
     
     public InformationForm(LoginForm owner) {
@@ -123,9 +139,9 @@ public class InformationForm extends JDialog {
         users = owner.getUsers();
         
         posts = new ArrayList<>();
-        for (String imagePath : IMAGES) {
-            posts.add(new Post(imagePath));
-        }
+        posts.add(new Post(IMAGES[0], "Post 1 Text"));
+        posts.add(new Post(IMAGES[1], "Post 2 Text"));
+        posts.add(new Post(IMAGES[2], "Post 3 Text"));
 
         init();
         addListeners();
@@ -228,6 +244,20 @@ public class InformationForm extends JDialog {
         
         PostPanel.setBounds(0, 50, 600, 400);
         PostPanel.add(lbimage);
+        
+        JPanel PostPanel_type = new JPanel();
+        PostPanel_type.setPreferredSize(new Dimension(100,50));
+        PostPanel_type.setLayout(new FlowLayout(FlowLayout.LEFT));
+        Post_lb = new JLabel();
+        Post_tf = new JTextField(20);
+        Post_bt = new JButton("Save");
+        
+        PostPanel_type.add(Post_tf);
+        PostPanel_type.add(Post_bt);
+        PostPanel_type.add(Post_lb);
+        
+        PostPanel_type.setBounds(0, 300, 600, 50);  // PostPanel의 SOUTH로 이동
+        PostPanel.add(PostPanel_type, BorderLayout.SOUTH);
         //버튼
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnPrev = new JButton("Prev");
@@ -361,10 +391,23 @@ public class InformationForm extends JDialog {
 			}
 		});
         
+        Post_bt.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Post_tf에 입력된 값을 가져와서 Post_lb에 표시
+                String userInput = Post_tf.getText();
+                Post_lb.setText(userInput);
+                
+                Post currentPost = posts.get(index);
+                currentPost.originalPostText = userInput;
+            }
+        });
+        
         comment_btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String comment = comment_tf.getText();
+                //User_Id를 들고온다.
                 String dateTime = getFormattedDateTime();
                 String commentWithDateTime = comment + "   " + dateTime + "\n";
                 addComment(commentWithDateTime);
@@ -397,12 +440,23 @@ public class InformationForm extends JDialog {
         });
     }
     
+ // InformationForm 클래스의 updatePost 메서드 수정
     private void updatePost() {
         Post currentPost = posts.get(index);
         lbimage.setIcon(new ImageIcon(currentPost.getImagePath()));
+
+        // Set Post_tf ""
+        Post_tf.setText("");
+
+        // Set originalPostText to the current post's original text
+        originalPostText = currentPost.getOriginalPostText();
+
+        // Set Post_lb to the original post text
+        Post_lb.setText(originalPostText);
+
+        // Update comments
         updateComments(currentPost.getComments());
     }
-    
     private void updateComments(List<String> comments) {
         taCheck.setText(""); // 기존 텍스트 지우기, 기존에 있던 댓글을 유지하기 위해서는 DB에 저장을 하고 불러오는 방법, 혹은 taCheck를 2개이상 만드는 것이다.
         for (String comment : comments) {
@@ -410,10 +464,14 @@ public class InformationForm extends JDialog {
         }
     }
     
+ // InformationForm 클래스의 addComment 메서드 수정
     private void addComment(String comment) {
         Post currentPost = posts.get(index);
         currentPost.addComment(comment);
         updateComments(currentPost.getComments());
+
+        // Comment added, update Post_lb using the current post's original text
+        // Post_lb.setText(currentPost.getOriginalPostText());
     }
     
  // 현재 날짜와 시간을 포맷팅하여 반환하는 메서드
@@ -423,11 +481,16 @@ public class InformationForm extends JDialog {
         return dateFormat.format(now);
     }
     
-    public void setTaCheck(String userInfo) {
-       // taCheck.setText(userInfo);
-        /*
-         * 채팅 기록을 남기는 부분이다.
-         * */
+ // Post에 내용 추가하는 메서드
+    private void addPost(String comment) {
+        Post currentPost = posts.get(index);
+        currentPost.addComment(comment);
+        updateComments(currentPost.getComments());
+    }
+    
+    public void setTaCheck(String string) {
+    	// TODO Auto-generated method stub
+    	
     }
 
     private void showFrame() {
@@ -437,4 +500,5 @@ public class InformationForm extends JDialog {
         setResizable(false);
       //  setVisible(true); // Added to make the dialog visible
     }
+
 }

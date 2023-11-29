@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Customer {
     public static void main(String[] args) {
-        createTable();
+        createUserTable();
         createFollowTable(); // follow 테이블 생성 추가
         createPostTable(); // post 테이블 생성 추가
         createCommentTable(); // comment 테이블 생성 추가
@@ -14,53 +14,9 @@ public class Customer {
 
     // 사용을 위해서 해당 프로젝트에 mysqldbconnector 생성 필요
     // SQL 문법에 맞추어 입력되는 값들을 DB로 전송한다
-    public static String[][] getCustomers() {
-        try {
-            Connection con = getConnection();
-            PreparedStatement statement = con.prepareStatement("Select name, author, booknumber, publisher, category, introduction FROM customer");
-            ResultSet results = statement.executeQuery();
-            ArrayList<String[]> list = new ArrayList<String[]>();
-            while (results.next()) {
-                list.add(new String[] {
-                        results.getString("name"),
-                        results.getString("author"),
-                        results.getString("booknumber"),
-                        results.getString("publisher"),
-                        results.getString("category"),
-                        results.getString("introduction"),
-                });
-            }
-            System.out.println("The data has been fetched");
-            String[][] arr = new String[list.size()][5];
-            return list.toArray(arr);
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    // 테이블에 Header 추가
-    public static void createCustomer(String name, String author, String booknumber, String publisher, String category, String introduction) {
-        try {
-            Connection con = getConnection();
-            PreparedStatement insert = con.prepareStatement(
-                    "INSERT INTO customer (name, author, booknumber, publisher, category, introduction) VALUES (?, ?, ?, ?, ?, ?)");
-            insert.setString(1, name);
-            insert.setString(2, author);
-            insert.setString(3, booknumber);
-            insert.setString(4, publisher);
-            insert.setString(5, category);
-            insert.setString(6, introduction);
-            insert.executeUpdate();
-            System.out.println("The data has been saved!");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
 
     // Table 생성
-    public static void createTable() {
+    public static void createUserTable() {
         try {
             Connection con = getConnection();
             PreparedStatement create = con.prepareStatement(
