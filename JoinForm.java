@@ -1,3 +1,5 @@
+package dbTwitter;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -229,7 +231,7 @@ public class JoinForm extends JDialog {
                         );
                         tfPw.requestFocus();*/
                     } else {
-                    	users.addUsers(new User(
+                    	boolean success = users.addUsers(new User(
                     		    tfId.getText(),
                     		    String.valueOf(tfPw.getPassword()),
                     		    tfName.getText(),
@@ -240,10 +242,15 @@ public class JoinForm extends JDialog {
                     		    tfintroduce.getText(),
                     		    getGender()
                     		));
-                        JOptionPane.showMessageDialog(
-                                JoinForm.this,
-                                "회원가입을 완료했습니다!"
-                        );
+                    	if(success) {
+                    		JOptionPane.showMessageDialog(
+                    				JoinForm.this,
+                    				"회원가입을 완료했습니다!"
+                    				);
+                    	}
+                    	else {
+                    		JOptionPane.showMessageDialog(JoinForm.this, "오류가 발생했습니다. 다시 시도해주세요");
+                    	}
                         dispose();
                         owner.setVisible(true);
                     }

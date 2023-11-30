@@ -1,3 +1,5 @@
+package dbTwitter;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -56,6 +58,7 @@ public class LoginForm extends JFrame {
         btnLogin.setPreferredSize(btnSize);
         btnJoin = new JButton("Join");
         btnJoin.setPreferredSize(btnSize);
+        
 
     }
     public UserDataSet getUsers() {
@@ -138,10 +141,10 @@ public class LoginForm extends JFrame {
                     } else {
                         InformationForm infoForm = new InformationForm(LoginForm.this);
                         infoForm.setTaCheck(users.getUser(tfId.getText()).toString());
-                        setVisible(false);
-                        infoForm.setVisible(true);
+                        setVisible(false); //LoginForm은 사라지고
+                        infoForm.setVisible(true); //information form은 만들어진다. 
                         tfId.setText("");
-                        tfPw.setText("");
+                       tfPw.setText("");
                     }
                     // 존재하지 않는 Id일 경우
                 } else {
