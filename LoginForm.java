@@ -8,6 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -100,7 +104,7 @@ public class LoginForm extends JFrame {
     }
 
     public void addListeners() {
-
+    	
         btnJoin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -113,50 +117,40 @@ public class LoginForm extends JFrame {
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 아이디칸이 비었을 경우
-                if (tfId.getText().isEmpty()) {
+                // 아이디칸 or 비밀번호칸이 비었을 경우
+                if (tfId.getText().isEmpty() || String.valueOf(tfPw.getPassword()).isEmpty()) {
                     JOptionPane.showMessageDialog(LoginForm.this,
-                            "아이디를 입력하세요.",
+                            "아이디/비밀번호를 입력하세요.",
                             "로그인폼",
-                            JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.WARNING_MESSAGE);   
+                } 
+                else{
+                	Connection con = Customer.getConnection();
+                	
+                	String sql="SELECT * FROM Customer WHERE user_id=? AND password=?";
+                	 try(PreparedStatement preparedStatement = con.prepareStatement(sql)){
+                         preparedStatement.setString(1, tfId.getText());
+                         preparedStatement.setString(2, String.valueOf(tfPw.getPassword()));
+                         ResultSet resultSet=preparedStatement.executeQuery();
+                         if(resultSet.next()) {
+                        	 InformationForm infoForm = new InformationForm(LoginForm.this);
+                             setVisible(false);
+                             infoForm.setVisible(true);
+                             tfId.setText("");
+                             tfPw.setText("");
+                         }
+                         else {
+                        	 JOptionPane.showMessageDialog(LoginForm.this, "로그인 실패: 유효한 ID와 Password가 아닙니다.");
+                         }
+                        	 
+                        	 
+                	 }catch(Exception e1) {
+                		 
+                	 }
 
-                    // 존재하는 아이디일 경우
-                } else if (users.contains(new User(tfId.getText()))) {
-
-                    // 비밀번호칸이 비었을 경우
-                    if(String.valueOf(tfPw.getPassword()).isEmpty()) {
-                        JOptionPane.showMessageDialog(
-                                LoginForm.this,
-                                "비밀번호를 입력하세요.",
-                                "로그인폼",
-                                JOptionPane.WARNING_MESSAGE);
-
-                        // 비밀번호가 일치하지 않을 경우
-                    } else if (!users.getUser(tfId.getText()).getPw().equals(String.valueOf(tfPw.getPassword()))) {
-                        JOptionPane.showMessageDialog(
-                                LoginForm.this,
-                                "비밀번호가 일치하지 않습니다.");
-
-                        // 다 완료될 경우
-                    } else {
-                        InformationForm infoForm = new InformationForm(LoginForm.this);
-                        infoForm.setTaCheck(users.getUser(tfId.getText()).toString());
-                        setVisible(false); //LoginForm은 사라지고
-                        infoForm.setVisible(true); //information form은 만들어진다. 
-                        tfId.setText("");
-                       tfPw.setText("");
-                    }
-                    // 존재하지 않는 Id일 경우
-                } else {
-                    JOptionPane.showMessageDialog(
-                            LoginForm.this,
-                            "존재하지 않는 Id입니다."
-                         
-                    );
-                
-                }
-            }
-        });
+//                    }
+               }
+            }});
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -174,7 +168,8 @@ public class LoginForm extends JFrame {
             }
         });
     }
-
+    
+        
     public void showFrame() {
         setTitle("Twitter");
         pack();

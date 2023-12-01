@@ -1,3 +1,5 @@
+package dbTwitter;
+
 class User {
 	private String id;
     private String pw;
