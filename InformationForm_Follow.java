@@ -93,14 +93,16 @@ public class InformationForm_Follow extends JDialog {
     }
     
     //if FollowForm에서 정보가 왔다면 이거를 사용하고 
-    public InformationForm_Follow(FollowFormCommon owner) {
-    	  super(owner instanceof FollowForm ? (FollowForm) owner : null, "Article", true);
-          this.owner = owner;
-        
-          posts = new ArrayList<>();
-          posts.add(new Post(IMAGES[0], "Post 1 Text"));
-          posts.add(new Post(IMAGES[1], "Post 2 Text"));
-          posts.add(new Post(IMAGES[2], "Post 3 Text"));
+    public InformationForm_Follow(FollowFormCommon owner, String userId) {
+        super(owner instanceof FollowForm ? (FollowForm) owner : null, "Article", true);
+        this.owner = owner;
+
+        // userId를 사용하여 해당 사용자의 정보를 가져오는 작업 수행
+
+        posts = new ArrayList<>();
+        posts.add(new Post(IMAGES[0], "Post 1 Text"));
+        posts.add(new Post(IMAGES[1], "Post 2 Text"));
+        posts.add(new Post(IMAGES[2], "Post 3 Text"));
 
         init();
         addListeners();

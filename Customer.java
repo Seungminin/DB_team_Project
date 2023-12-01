@@ -55,16 +55,11 @@ public class Customer {
 	         PreparedStatement create = con.prepareStatement(
 	             "CREATE TABLE IF NOT EXISTS `db_final`.`follow` (" +
 	                     "`follow_id` int NOT NULL AUTO_INCREMENT," +
-	                     "`follower_id` int NOT NULL," +
 	                     "`following_id` int NOT NULL," +
-	                     "PRIMARY KEY (`follow_id`)," +
-	                     "INDEX idx_follower_id (`follower_id`)," +
+	                     "PRIMARY KEY (`follow_id`, `following_id`)," +  // 변경: PRIMARY KEY에 following_id 추가
 	                     "INDEX idx_following_id (`following_id`)," +
-	                     "FOREIGN KEY (`follower_id`) REFERENCES `customer` (`user_id`)" +
-	                     "  ON DELETE NO ACTION ON UPDATE NO ACTION," +
 	                     "FOREIGN KEY (`following_id`) REFERENCES `customer` (`user_id`)" +
-	                     "  ON DELETE NO ACTION ON UPDATE NO ACTION);")) {
-
+	                     "  ON DELETE CASCADE ON UPDATE CASCADE);")) {
 	        create.execute();
 	        System.out.println("Follow table successfully created");
 	    } catch (Exception e) {
@@ -122,6 +117,159 @@ public class Customer {
 	            System.out.println("Error creating comment table: " + e.getMessage());
 	        }
 	    }
+	public void delete(String id, int index) {
+	    PreparedStatement pstmt = null;
+	    ResultSet res = null;
+
+	    try {
+	        // 1. 팔로우하는 친구의 ID 조회
+	        String selectSql = "SELECT follow_id FROM follow WHERE following_id = ?";
+	        pstmt = con.prepareStatement(selectSql);
+	        pstmt.setString(1, id);
+	        res = pstmt.executeQuery();
+
+	        int count = 0;
+	        String[] friendIds = new String[2];
+	        while (res.next() && count < 2) {
+	            friendIds[count] = res.getString(1);
+	            count++;
+	        }
+
+	        // 2. 친구 삭제
+	        if (index >= 0 && index < count) {
+	            String deleteSql = "DELETE FROM follow WHERE following_id = ?";
+	            pstmt = con.prepareStatement(deleteSql);
+	            pstmt.setString(1, friendIds[index]);
+	            int rowsAffected = pstmt.executeUpdate();
+
+	            if (rowsAffected > 0) {
+	                System.out.println("Success delete follow");
+	            } else {
+	                System.out.println("Failed delete follow");
+	            }
+	        } else {
+	            System.out.println("Fail because of syntax");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (pstmt != null) pstmt.close();
+	            if (res != null) res.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
+
+	public void getId(String id, String[] friends) {
+		 Statement stmt = null;
+	     ResultSet res = null;
+	        try {
+	            String sql = "SELECT user_id FROM customer WHERE user_id IN (SELECT following_id FROM follow WHERE follow_id = " + id + ")";
+	            stmt = con.createStatement();
+	            res = stmt.executeQuery(sql);
+
+	            int count = 0;
+	            while (res.next() && count < 3) {
+	                // 결과가 있으면 해당 결과의 "name" 컬럼 값을 객체에 저장
+	            	if (count == 0) {
+	                    friends[count] = res.getString(1);
+	                } else if (count == 1) {
+	                    friends[count]= res.getString(1);
+	                }
+	                count++;
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            try {
+	                if (stmt != null) stmt.close();
+	                if (res != null) res.close();
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	        }
+	}
+	public void getName(String id, String[] names) {
+        Statement stmt = null;
+        ResultSet res = null;
+        try {
+            String sql = "SELECT name FROM customer WHERE user_id IN (SELECT following_id FROM follow WHERE follow_id = " + id + ")";
+            stmt = con.createStatement();
+            res = stmt.executeQuery(sql);
+
+            int count = 0;
+            while (res.next() && count < 3) {
+                // 결과가 있으면 해당 결과의 "name" 컬럼 값을 객체에 저장
+            	if (count == 0) {
+                    names[count] = res.getString(1);
+                } else if (count == 1) {
+                    names[count]= res.getString(1);
+                }
+                count++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (res != null) res.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+	public void getfriends(String id, String[] toge_names) {
+	    PreparedStatement pstmt = null;
+	    ResultSet res = null;
+
+	    try {
+	        // 첫 번째 쿼리 실행
+	        String sql = "SELECT follow_id FROM follow WHERE following_id = ?";
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, id);
+	        res = pstmt.executeQuery();
+
+	        int count = 0;
+	        String[] friendIds = new String[2];
+	        while (res.next() && count < 2) {
+	            friendIds[count] = res.getString(1);
+	            count++;
+	        }
+
+	        // 두 번째 및 세 번째 쿼리 실행
+	        for (int i = 0; i < friendIds.length; i++) {
+	            String friendId = friendIds[i];
+	            String sql1 = "SELECT COUNT(follow_id) AS overlapping_count " +
+	                          "FROM follow " +
+	                          "WHERE follow_id = ? AND following_id IN (SELECT following_id FROM follow WHERE follow_id = ?)";
+	            pstmt = con.prepareStatement(sql1);
+	            pstmt.setString(1, id);
+	            pstmt.setString(2, friendId);
+	            res = pstmt.executeQuery();
+	            int overlappingCount = 0;
+	            if (res.next()) {
+	                overlappingCount = res.getInt("overlapping_count");
+	            }
+	            toge_names[i] = String.valueOf(overlappingCount);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (pstmt != null) pstmt.close();
+	            if (res != null) res.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
+
+
+
 	public boolean isIdOverlap(int id) {
         Statement stmt = null;
         ResultSet res = null;

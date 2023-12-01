@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 public class LoginForm extends JFrame {
+	private InformationForm informationForm;
 	
 	//Customer = DB서버. 
 	private Customer customer = new Customer();
@@ -138,9 +139,9 @@ public class LoginForm extends JFrame {
                       //전부 로그인이 되었을 때.
                     } else {
                         // 로그인 성공
-                        InformationForm infoForm = new InformationForm(LoginForm.this);
+                    	  informationForm = new InformationForm(LoginForm.this);
+                          informationForm.setVisible(true);
                         setVisible(false);
-                        infoForm.setVisible(true);
                         tfId.setText("");
                         tfPw.setText("");
                     }

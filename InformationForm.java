@@ -54,7 +54,8 @@ import javax.swing.border.TitledBorder;
     } 이런 느낌으로 테이블을 만든다.
  * */
 public class InformationForm extends JDialog {
-    private LoginForm owner;
+	private LoginForm owner;
+	private String user_id; // 사용자 아이디를 저장할 변수
     private UserDataSet users;
 
     private JoinForm joinForm;
@@ -134,9 +135,9 @@ public class InformationForm extends JDialog {
     }
     
     public InformationForm(LoginForm owner) {
-        super(owner, "information", true);
+    	super(owner, "information", true);
         this.owner = owner;
-        users = owner.getUsers();
+        this.user_id = owner.getTfId(); // owner가 정상적으로 초기화된 후에 호출
         
         posts = new ArrayList<>();
         posts.add(new Post(IMAGES[0], "Post 1 Text"));
@@ -147,7 +148,7 @@ public class InformationForm extends JDialog {
         addListeners();
         showFrame();
     }
-
+    
     private void init() {
     	  
     	//
@@ -489,10 +490,24 @@ public class InformationForm extends JDialog {
         updateComments(currentPost.getComments());
     }
     
-    public void setTaCheck(String string) {
-    	// TODO Auto-generated method stub
-    	
+    public String getId() {
+    	return user_id;
     }
+    
+    public void setTaCheck(String userInfo) {
+        taCheck.setText(userInfo);
+         /*
+          * 채팅 기록을 남기는 부분이다.
+          * */
+         
+         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+         Date now = new Date();
+         String timeFormat = dateFormat.format(now);
+
+         String currentText = taCheck.getText();
+         taCheck.setText(currentText + "[" + timeFormat + "] " + userInfo + "\n");
+         
+     }
 
     private void showFrame() {
         pack();

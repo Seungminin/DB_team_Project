@@ -15,31 +15,39 @@ import javax.swing.border.EmptyBorder;
 //공통된 동작을 가진 인터페이스 정의
 interface FollowFormCommon {
  void showInformation();
+
+void showInformation(int friendIndex);
 }
 
-
+//FollowForm에서 그 친구의 id를 information_follow로 넘겨줘야 한다. 
 public class FollowForm extends JDialog implements FollowFormCommon {
     private InformationForm owner;
+    private Customer customer = new Customer();
+  //내가 누구인 지에 대한 user_id 불러오기.
+    private String user_id;
+    private String[] friends = new String[3];
+    private String[] names = new String[3]; 
+    private String[] toge_names = new String[3];
     
+   
     private JLabel lblTitle;
     private JLabel lb1;
     private JLabel lb2;
-    private JLabel lb3;
     
     private JLabel t_lb1;
     private JLabel t_lb2;
-    private JLabel t_lb3;
     
     private JButton view1;
     private JButton delete1;
     private JButton view2;
     private JButton delete2;
-    private JButton view3;
-    private JButton delete3;
+
     
     public FollowForm(InformationForm owner) {
         super(owner, "Follow", true);
         this.owner = owner;
+        this.user_id=owner.getId();
+        
         init();
         setDisplay();
         addListener();
@@ -47,13 +55,15 @@ public class FollowForm extends JDialog implements FollowFormCommon {
     }
     
     @Override
-    public void showInformation() {
-        // 공통 동작 구현
-    	dispose();  // Close the current dialog
-    	InformationForm_Follow info_follow = new InformationForm_Follow(FollowForm.this);
-	    info_follow.setVisible(true);
-    }
+    public void showInformation(int friendIndex) {
+        // friends 배열의 인덱스에 해당하는 친구의 id를 가져옴
+        String friendId = friends[friendIndex];
 
+        // 공통 동작 구현
+        dispose();  // 현재 다이얼로그 닫기
+        InformationForm_Follow info_follow = new InformationForm_Follow(FollowForm.this, friendId);
+        info_follow.setVisible(true);
+    }
     private void init() {
         // 초기화 작업 수행
     	 Dimension lblSize = new Dimension(120, 25);
@@ -63,21 +73,23 @@ public class FollowForm extends JDialog implements FollowFormCommon {
          lblTitle.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
          
          //우리는 Follower, Following을 3명으로 가정을 한다.
-         lb1 = new JLabel("Name", JLabel.LEFT);
+         customer.getName(user_id, names);
+         customer.getId(user_id, friends); //following 한 친구들의 id를 보낼 수 있다.
+         System.out.println("User_ID = "+user_id);
+         lb1 = new JLabel(names[0], JLabel.LEFT);
          lb1.setPreferredSize(lblSize);
-         lb2 = new JLabel("Name", JLabel.LEFT);
+         lb2 = new JLabel(names[1], JLabel.LEFT);
          lb2.setPreferredSize(lblSize);
-         lb3 = new JLabel("Name", JLabel.LEFT);
-         lb3.setPreferredSize(lblSize);
+
          
-         //함께아는 친구
-         t_lb1 = new JLabel("together", JLabel.LEFT);
+         // 함께아는 친구
+         customer.getfriends(user_id, toge_names);
+
+         t_lb1 = new JLabel(toge_names[0], JLabel.LEFT);
          t_lb1.setPreferredSize(lblSize);
-         t_lb2 = new JLabel("together", JLabel.LEFT);
+         t_lb2 = new JLabel(toge_names[1], JLabel.LEFT);
          t_lb2.setPreferredSize(lblSize);
-         t_lb3 = new JLabel("together", JLabel.LEFT);
-         t_lb3.setPreferredSize(lblSize);
-         
+
          view1 = new JButton("View");
          view1.setPreferredSize(btnSize);
          delete1=new JButton("DELETE");
@@ -87,11 +99,6 @@ public class FollowForm extends JDialog implements FollowFormCommon {
          view2.setPreferredSize(btnSize);
          delete2=new JButton("DELETE");
          delete2.setPreferredSize(btnSize);
-         
-         view3 = new JButton("View");
-         view3.setPreferredSize(btnSize);
-         delete3=new JButton("DELETE");
-         delete3.setPreferredSize(btnSize);
          
     }
 
@@ -120,15 +127,9 @@ public class FollowForm extends JDialog implements FollowFormCommon {
         f_2.add(view2);
         f_2.add(delete2);
         
-        JPanel f_3 = new JPanel(flowLeft);
-        f_3.add(lb3);
-        f_3.add(t_lb3);
-        f_3.add(view3);
-        f_3.add(delete3);
         
         pnlCenter.add(f_1);
         pnlCenter.add(f_2);
-        pnlCenter.add(f_3);
         
         pnlMain.add(pnlNorth,BorderLayout.NORTH);
         pnlMain.add(pnlCenter,BorderLayout.CENTER);
@@ -145,21 +146,14 @@ public class FollowForm extends JDialog implements FollowFormCommon {
     	view1.addActionListener(new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
-    	    	showInformation();
+    	    	showInformation(0);
     	    }
     	});
 
     	view2.addActionListener(new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
-    	    	showInformation();
-    	    }
-    	});
-
-    	view3.addActionListener(new ActionListener() {
-    	    @Override
-    	    public void actionPerformed(ActionEvent e) {
-    	    	showInformation();
+    	    	showInformation(1);
     	    }
     	});
     	
@@ -168,7 +162,7 @@ public class FollowForm extends JDialog implements FollowFormCommon {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
+				customer.delete(user_id, 0);
 			}
 		});
     	
@@ -177,20 +171,13 @@ public class FollowForm extends JDialog implements FollowFormCommon {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				customer.delete(user_id, 1);
 				
 			}
 		});
 
-    	delete3.addActionListener(new ActionListener() {
-    		//delete info of Friends_3
-    		@Override
-    		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-		
-		}
-    	});
     }
-
+    
     private void showFrame() {
         pack();
         setLocationRelativeTo(owner);
@@ -198,4 +185,10 @@ public class FollowForm extends JDialog implements FollowFormCommon {
         setResizable(false);
         setVisible(true);
     }
+
+	@Override
+	public void showInformation() {
+		// TODO Auto-generated method stub
+		
+	}
 }
