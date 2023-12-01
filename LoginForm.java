@@ -18,6 +18,8 @@ import javax.swing.border.EmptyBorder;
 
 public class LoginForm extends JFrame {
 	
+	//Customer = DB서버. 
+	private Customer customer = new Customer();
 	private UserDataSet users;
 
     private JLabel lblId;
@@ -29,7 +31,7 @@ public class LoginForm extends JFrame {
     
 
     public LoginForm() {
-    
+    	customer.getConnection();
     	users = new UserDataSet();
 
         init();
@@ -98,7 +100,6 @@ public class LoginForm extends JFrame {
     }
 
     public void addListeners() {
-
         btnJoin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -119,7 +120,7 @@ public class LoginForm extends JFrame {
                             JOptionPane.WARNING_MESSAGE);
 
                     // 존재하는 아이디일 경우
-                } else if (users.contains(new User(tfId.getText()))) {
+                }  else if (customer.contains(tfId.getText())) {
 
                     // 비밀번호칸이 비었을 경우
                     if(String.valueOf(tfPw.getPassword()).isEmpty()) {
@@ -130,19 +131,18 @@ public class LoginForm extends JFrame {
                                 JOptionPane.WARNING_MESSAGE);
 
                         // 비밀번호가 일치하지 않을 경우
-                    } else if (!users.getUser(tfId.getText()).getPw().equals(String.valueOf(tfPw.getPassword()))) {
+                    } else if (!customer.pw_check(tfId.getText(), String.valueOf(tfPw.getPassword()))) {
                         JOptionPane.showMessageDialog(
                                 LoginForm.this,
                                 "비밀번호가 일치하지 않습니다.");
-
-                        // 다 완료될 경우
+                      //전부 로그인이 되었을 때.
                     } else {
+                        // 로그인 성공
                         InformationForm infoForm = new InformationForm(LoginForm.this);
-                        infoForm.setTaCheck(users.getUser(tfId.getText()).toString());
-                        setVisible(false); //LoginForm은 사라지고
-                        infoForm.setVisible(true); //information form은 만들어진다. 
+                        setVisible(false);
+                        infoForm.setVisible(true);
                         tfId.setText("");
-                       tfPw.setText("");
+                        tfPw.setText("");
                     }
                     // 존재하지 않는 Id일 경우
                 } else {

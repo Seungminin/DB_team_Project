@@ -314,6 +314,7 @@ public class InformationForm extends JDialog {
     }
 
     private void addListeners() {
+    	Customer customer = new Customer();
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent we) {
@@ -324,7 +325,7 @@ public class InformationForm extends JDialog {
         btnWithdraw.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                users.withdraw(owner.getTfId());
+                customer.withdraw(owner.getTfId());
                 JOptionPane.showMessageDialog(
                         InformationForm.this,
                         "회원 정보가 삭제되었습니다. 안녕히가세요."

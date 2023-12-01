@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import InformationForm.Post;
+//import InformationForm.Post;
 
 public class InformationForm_Follow extends JDialog {
 	private FollowFormCommon owner;
