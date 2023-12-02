@@ -29,8 +29,10 @@ import javax.swing.border.TitledBorder;
 
 public class InformationForm_Follow extends JDialog {
 	private FollowFormCommon owner;
-
+	private Customer customer = new Customer();
     private JoinForm joinForm;
+    private String title;
+    private String user_id;
 
     //Follower, Following을 보는 버튼
     private JButton Follower;
@@ -96,7 +98,8 @@ public class InformationForm_Follow extends JDialog {
     public InformationForm_Follow(FollowFormCommon owner, String userId) {
         super(owner instanceof FollowForm ? (FollowForm) owner : null, "Article", true);
         this.owner = owner;
-
+        title = customer.getfriendsId(userId);
+        this.user_id=userId;
         // userId를 사용하여 해당 사용자의 정보를 가져오는 작업 수행
 
         posts = new ArrayList<>();
@@ -131,8 +134,8 @@ public class InformationForm_Follow extends JDialog {
         JPanel p1_up = new JPanel();
         p1_up.setPreferredSize(new Dimension(250, 30));
         p1_up.setBackground(c1);
-
-        JLabel l1 = new JLabel("Follow Article");
+        
+        JLabel l1 = new JLabel(title+" Article");
         p1_up.add(l1);
         cp.add(p1_up, BorderLayout.NORTH);
 
@@ -315,6 +318,10 @@ public class InformationForm_Follow extends JDialog {
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date now = new Date();
         return dateFormat.format(now);
+    }
+    
+    public String getId() {
+    	return user_id;
     }
     
     public void setTaCheck(String userInfo) {

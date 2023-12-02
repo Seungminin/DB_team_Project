@@ -15,23 +15,24 @@ import javax.swing.border.EmptyBorder;
 
 public class FollowForm_friends extends JDialog implements FollowFormCommon {
     private InformationForm_Follow owner;
+    private Customer customer = new Customer();
+    private String user_id;
+    private String[] friends = new String[3];
+    private String[] names = new String[3]; 
+    private String[] toge_names = new String[3];
     
     private JLabel lblTitle;
     private JLabel lb1;
     private JLabel lb2;
-    private JLabel lb3;
-    
-    private JLabel t_lb1;
-    private JLabel t_lb2;
-    private JLabel t_lb3;
     
     private JButton view1;
     private JButton view2;
-    private JButton view3;
     
     public FollowForm_friends(InformationForm_Follow owner) {
         super(owner, "Follow_friends", true);
         this.owner = owner;
+        this.user_id=owner.getId();
+        
         init();
         setDisplay();
         addListener();
@@ -39,11 +40,13 @@ public class FollowForm_friends extends JDialog implements FollowFormCommon {
     }
     
     @Override
-    public void showInformation() {
+    public void showInformation(int friendIndex) {
+    	 // friends 배열의 인덱스에 해당하는 친구의 id를 가져옴
+        String friendId = friends[friendIndex];
         // 공통 동작 구현
     	// 예: InformationForm_Follow를 생성하고 보이게 하는 등의 동작을 추가할 수 있습니다.
     	dispose();  // Close the current dialog
-        InformationForm_Follow infoFollow = new InformationForm_Follow(this);
+        InformationForm_Follow infoFollow = new InformationForm_Follow(FollowForm_friends.this,friendId);
         infoFollow.setVisible(true);
     }
 
@@ -56,30 +59,19 @@ public class FollowForm_friends extends JDialog implements FollowFormCommon {
          lblTitle.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
          
          //우리는 Follower, Following을 3명으로 가정을 한다.
-         lb1 = new JLabel("Name", JLabel.LEFT);
+         customer.getName(user_id, names);
+         customer.getId(user_id, friends); //following 한 친구들의 id를 보낼 수 있다.
+         System.out.println("User_ID = "+user_id);
+         lb1 = new JLabel(names[0], JLabel.LEFT);
          lb1.setPreferredSize(lblSize);
-         lb2 = new JLabel("Name", JLabel.LEFT);
+         lb2 = new JLabel(names[1], JLabel.LEFT);
          lb2.setPreferredSize(lblSize);
-         lb3 = new JLabel("Name", JLabel.LEFT);
-         lb3.setPreferredSize(lblSize);
-         
-         //함께 아는 친구들
-         t_lb1 = new JLabel("together", JLabel.LEFT);
-         t_lb1.setPreferredSize(lblSize);
-         t_lb2 = new JLabel("together", JLabel.LEFT);
-         t_lb2.setPreferredSize(lblSize);
-         t_lb3 = new JLabel("together", JLabel.LEFT);
-         t_lb3.setPreferredSize(lblSize);
          
          view1 = new JButton("View");
          view1.setPreferredSize(btnSize);
          
          view2 = new JButton("View");
-         view2.setPreferredSize(btnSize);
-         
-         view3 = new JButton("View");
-         view3.setPreferredSize(btnSize);
-         
+         view2.setPreferredSize(btnSize);        
     }
 
     private void setDisplay() {
@@ -96,23 +88,19 @@ public class FollowForm_friends extends JDialog implements FollowFormCommon {
         //pnlCenter(Lable view delete)
         JPanel pnlCenter = new JPanel(new GridLayout(3, 0)); // 3열의 그리드 레이아웃
         JPanel f_1 = new JPanel(flowLeft);
-        f_1.add(lb1);
-        f_1.add(t_lb1);
-        f_1.add(view1);
+        if (lb1 != null) {
+            f_1.add(lb1);
+            f_1.add(view1);
+        }
         
         JPanel f_2 = new JPanel(flowLeft);
-        f_2.add(lb2);
-        f_2.add(t_lb2);
-        f_2.add(view2);
-        
-        JPanel f_3 = new JPanel(flowLeft);
-        f_3.add(lb3);
-        f_3.add(t_lb3);
-        f_3.add(view3);
+        if (lb2 != null) {
+            f_2.add(lb2);
+            f_2.add(view2);
+        }
         
         pnlCenter.add(f_1);
         pnlCenter.add(f_2);
-        pnlCenter.add(f_3);
         
         pnlMain.add(pnlNorth,BorderLayout.NORTH);
         pnlMain.add(pnlCenter,BorderLayout.CENTER);
@@ -128,21 +116,14 @@ public class FollowForm_friends extends JDialog implements FollowFormCommon {
     	view1.addActionListener(new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
-    	    	 showInformation();
+    	    	 showInformation(0);
     	    }
     	});
 
     	view2.addActionListener(new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
-    	    	 showInformation();
-    	    }
-    	});
-
-    	view3.addActionListener(new ActionListener() {
-    	    @Override
-    	    public void actionPerformed(ActionEvent e) {
-    	    	 showInformation();
+    	    	 showInformation(1);
     	    }
     	});
     }
@@ -154,4 +135,10 @@ public class FollowForm_friends extends JDialog implements FollowFormCommon {
         setResizable(false);
         setVisible(true);
     }
+
+	@Override
+	public void showInformation() {
+		// TODO Auto-generated method stub
+		
+	}
 }

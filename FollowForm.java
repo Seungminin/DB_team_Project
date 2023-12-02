@@ -29,7 +29,9 @@ public class FollowForm extends JDialog implements FollowFormCommon {
     private String[] names = new String[3]; 
     private String[] toge_names = new String[3];
     
-   
+    private JPanel f_1;
+    private JPanel f_2;
+    
     private JLabel lblTitle;
     private JLabel lb1;
     private JLabel lb2;
@@ -42,7 +44,6 @@ public class FollowForm extends JDialog implements FollowFormCommon {
     private JButton view2;
     private JButton delete2;
 
-    
     public FollowForm(InformationForm owner) {
         super(owner, "Follow", true);
         this.owner = owner;
@@ -115,17 +116,21 @@ public class FollowForm extends JDialog implements FollowFormCommon {
         
         //pnlCenter(Lable view delete)
         JPanel pnlCenter = new JPanel(new GridLayout(3, 0)); // 3열의 그리드 레이아웃
-        JPanel f_1 = new JPanel(flowLeft);
-        f_1.add(lb1);
-        f_1.add(t_lb1);
-        f_1.add(view1);
-        f_1.add(delete1);
+        f_1 = new JPanel(flowLeft);
+        if (lb1 != null) {
+            f_1.add(lb1);
+            f_1.add(t_lb1);
+            f_1.add(view1);
+            f_1.add(delete1);
+        }
         
-        JPanel f_2 = new JPanel(flowLeft);
-        f_2.add(lb2);
-        f_2.add(t_lb2);
-        f_2.add(view2);
-        f_2.add(delete2);
+        f_2 = new JPanel(flowLeft);
+        if (lb2 != null) {
+            f_2.add(lb2);
+            f_2.add(t_lb2);
+            f_2.add(view2);
+            f_2.add(delete2);
+        }
         
         
         pnlCenter.add(f_1);
@@ -163,6 +168,7 @@ public class FollowForm extends JDialog implements FollowFormCommon {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				customer.delete(user_id, 0);
+				f_1.setVisible(false);  // f_1 패널을 숨김
 			}
 		});
     	
@@ -172,7 +178,7 @@ public class FollowForm extends JDialog implements FollowFormCommon {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				customer.delete(user_id, 1);
-				
+				f_2.setVisible(false);  // f_2 패널을 숨김
 			}
 		});
 

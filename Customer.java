@@ -123,7 +123,7 @@ public class Customer {
 
 	    try {
 	        // 1. 팔로우하는 친구의 ID 조회
-	        String selectSql = "SELECT follow_id FROM follow WHERE following_id = ?";
+	        String selectSql = "SELECT following_id FROM follow WHERE follow_id = ?";
 	        pstmt = con.prepareStatement(selectSql);
 	        pstmt.setString(1, id);
 	        res = pstmt.executeQuery();
@@ -132,12 +132,13 @@ public class Customer {
 	        String[] friendIds = new String[2];
 	        while (res.next() && count < 2) {
 	            friendIds[count] = res.getString(1);
+	            System.out.println(res.getString(1));
 	            count++;
 	        }
 
 	        // 2. 친구 삭제
 	        if (index >= 0 && index < count) {
-	            String deleteSql = "DELETE FROM follow WHERE following_id = ?";
+	            String deleteSql = "DELETE FROM follow WHERE following_id = ? && follow_id = "+id;
 	            pstmt = con.prepareStatement(deleteSql);
 	            pstmt.setString(1, friendIds[index]);
 	            int rowsAffected = pstmt.executeUpdate();
@@ -267,7 +268,86 @@ public class Customer {
 	        }
 	    }
 	}
+	
+	public void getpostContent(String content) {
+		Statement stmt = null;
+	    
+	    try {
+	    	stmt = con.createStatement();
+	        String sql = "SELECT post_id, content FROM post WHERE content = ?";
+	        PreparedStatement pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, content); 
+	        ResultSet resultSet = pstmt.executeQuery();
+	            
+	        while (resultSet.next()) {
+	        	String post_Id = resultSet.getString("post_id");
+	            String post_Content = resultSet.getString("content");
+	            System.out.println("Post ID: " + post_Id + ", Content: " + post_Content);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	    	try {
+	    		if (stmt != null) stmt.close();
+	    	}catch(Exception e) {
+	    		e.printStackTrace();
+	    	}
+	    }
+	}
 
+
+	public void getcommentContent(String content) {
+		Statement stmt = null;
+		
+	    try {
+	    	stmt = con.createStatement();
+	        String sql = "SELECT comment_id, content, created_at FROM comment WHERE content = ?";
+	        PreparedStatement pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, content); 
+	        ResultSet resultSet = pstmt.executeQuery();
+
+	            while (resultSet.next()) {
+	                String comment_Id = resultSet.getString("comment_id");
+	                String comment_Content = resultSet.getString("content");
+	                String comment_dateTime = resultSet.getString("created_at");
+	                System.out.println("Comment ID: " + comment_Id + ", Content: " + comment_Content + ", DateTime: " + comment_dateTime);
+	            }
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    } finally {
+	    	try {
+	    		if(stmt != null) stmt.close();
+	    	}catch(Exception e) {
+	    		e.printStackTrace();
+	    	}
+	    }
+	}
+	//InformationForm_friends에서 친구의 id_name을 가져오는 것이다. 
+	public String getfriendsId(String user_id) {
+	    Statement stmt = null;
+	    ResultSet res = null;
+	    String result = null;
+
+	    try {
+	        String sql = "SELECT NAME FROM CUSTOMER WHERE USER_ID = " + user_id;
+	        stmt = con.createStatement();
+	        res = stmt.executeQuery(sql);
+
+	        if (res.next()) {
+	            result = res.getString(1);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (stmt != null) stmt.close();
+	            if (res != null) res.close(); // ResultSet도 닫아주어야 합니다.
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return result;
+	}
 
 
 	public boolean isIdOverlap(int id) {
