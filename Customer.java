@@ -1,3 +1,5 @@
+
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -73,7 +75,7 @@ public class Customer {
 						"CREATE TABLE IF NOT EXISTS `db_final`.`post` (" +
 								"`post_id` VARCHAR(45) NOT NULL," +
 								"`content` TEXT NULL," +
-								"`location` VARCHAR(30) NULL," +
+								"`location` VARCHAR(100) NULL," +
 								"`user_id` int NOT NULL," + // 수정: user_id 데이터 타입 변경
 								"PRIMARY KEY (`post_id`)," +
 								"FOREIGN KEY (`user_id`)" +
@@ -94,9 +96,10 @@ public class Customer {
 						"CREATE TABLE IF NOT EXISTS `db_final`.`comment` (" +
 								"`comment_id` VARCHAR(45) NOT NULL," +
 								"`content` VARCHAR(200) NULL," +
-								"`parent_id` VARCHAR(45) NOT NULL," + // Change data type to VARCHAR(45)
+							    "`parent_id` VARCHAR(45) NOT NULL," + // Change data type to VARCHAR(45)
 								"`user_id` int NOT NULL," +
 								"`post_id` VARCHAR(45) NOT NULL," +
+								"`created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
 								"PRIMARY KEY (`comment_id`)," +
 								"FOREIGN KEY (`parent_id`)" +
 								"  REFERENCES `db_final`.`comment` (`comment_id`)" + // Change reference table and column
@@ -301,7 +304,7 @@ public class Customer {
 		
 	    try {
 	    	stmt = con.createStatement();
-	        String sql = "SELECT comment_id, content, created_at FROM comment WHERE content = ?";
+	        String sql = "SELECT comment_id, content FROM comment WHERE content = ?";
 	        PreparedStatement pstmt = con.prepareStatement(sql);
 	        pstmt.setString(1, content); 
 	        ResultSet resultSet = pstmt.executeQuery();

@@ -11,6 +11,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,7 +31,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-
 
 /*
  * //Table 생성
@@ -104,13 +106,20 @@ public class InformationForm extends JDialog {
         private String imagePath;
         private String postText;
         private String originalPostText; // New field for original post text
+        private String userId;
+        private String postId;
         private List<String> comments;
 
-        public Post(String imagePath, String postText) {
+        public Post(String imagePath, String postText, String postId) {
+        	this.postId = postId;
             this.imagePath = imagePath;
             this.postText = postText;
             this.originalPostText = postText; // Initialize original post text
             this.comments = new ArrayList<>();
+        }
+        
+        public String getPostId() {
+        	return postId;
         }
 
         public String getImagePath() {
@@ -140,9 +149,9 @@ public class InformationForm extends JDialog {
         this.user_id = owner.getTfId(); // owner가 정상적으로 초기화된 후에 호출
         
         posts = new ArrayList<>();
-        posts.add(new Post(IMAGES[0], "Post 1 Text"));
-        posts.add(new Post(IMAGES[1], "Post 2 Text"));
-        posts.add(new Post(IMAGES[2], "Post 3 Text"));
+        posts.add(new Post(IMAGES[0], "Post 1 Text", "user1"));
+        posts.add(new Post(IMAGES[1], "Post 2 Text", "user2"));
+        posts.add(new Post(IMAGES[2], "Post 3 Text", "user3"));
 
         init();
         addListeners();
@@ -398,10 +407,12 @@ public class InformationForm extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 // Post_tf에 입력된 값을 가져와서 Post_lb에 표시
                 String userInput = Post_tf.getText();
+                String imagePath = IMAGES[index];
                 Post_lb.setText(userInput);
                 
                 Post currentPost = posts.get(index);
                 currentPost.originalPostText = userInput;
+                insertPostDB(userInput, imagePath);
             }
         });
         
@@ -409,10 +420,11 @@ public class InformationForm extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String comment = comment_tf.getText();
-                //User_Id를 들고온다.
+                String userId = getId();//User_Id를 들고온다.
                 String dateTime = getFormattedDateTime();
-                String commentWithDateTime = comment + "   " + dateTime + "\n";
+                String commentWithDateTime = comment + "   " + userId + " " + dateTime + "\n";
                 addComment(commentWithDateTime);
+                insertCommentDB(commentWithDateTime);
             }
         });
         
@@ -493,9 +505,14 @@ public class InformationForm extends JDialog {
     public String getId() {
     	return user_id; 
     }
-	 public String getUserId() {
+	public String getUserId() {
         return this.user_id;
     }
+	private String getCurrentPostId() {
+		Post currentPost = posts.get(index);
+	    return currentPost.getPostId();
+	}
+	    
     
     public void setTaCheck(String userInfo) {
         taCheck.setText(userInfo);
@@ -511,6 +528,47 @@ public class InformationForm extends JDialog {
          taCheck.setText(currentText + "[" + timeFormat + "] " + userInfo + "\n");
          
      }
+    
+    private void insertPostDB(String location, String comment){
+        try 
+        (Connection con = Customer.getConnection()) {
+            String postquery = "INSERT INTO post (post_id, content, location, user_id) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement pstmt = con.prepareStatement(postquery)) {
+            	pstmt.setString(1, getCurrentPostId());
+                pstmt.setString(2, Post_tf.getText()); 
+                pstmt.setString(3, location);
+                pstmt.setString(4, getId());
+                pstmt.executeUpdate();
+                System.out.println("Post inserted successfully!");
+                
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } 
+    }catch(SQLException e) {
+    	e.printStackTrace();
+    }
+}
+
+    public void insertCommentDB(String comment) {
+        try 
+        (Connection con = Customer.getConnection()) {
+            String commentquery = "INSERT INTO comment (comment_id, content, parent_id, user_id, post_id) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = con.prepareStatement(commentquery)) { 
+            	
+                pstmt.setString(1, getId()); 
+                pstmt.setString(2, comment_tf.getText());
+                pstmt.setString(3, getId());
+                pstmt.setString(4, getId()); 
+                pstmt.setString(5, getCurrentPostId()); 
+                // pstmt.setString(6, getFormattedDateTime());
+               // pstmt.setString(7, dateTime);
+                pstmt.executeUpdate();
+                System.out.println("Comment inserted successfully!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    } 
 
     private void showFrame() {
         pack();
