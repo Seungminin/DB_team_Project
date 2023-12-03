@@ -1,4 +1,4 @@
-
+package db_final;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,9 +25,6 @@ public class Customer {
 		    e.printStackTrace();
 		  }
 		}
-
-    // 사용을 위해서 해당 프로젝트에 mysqldbconnector 생성 필요
-    // SQL 문법에 맞추어 입력되는 값들을 DB로 전송한다
 
     //Table 생성, DB생성.
 	public static void createUserTable() {
@@ -120,6 +117,44 @@ public class Customer {
 	            System.out.println("Error creating comment table: " + e.getMessage());
 	        }
 	    }
+	public void post_Content(String content) {
+	      Statement stmt = null;
+	        try {
+	           stmt = con.createStatement();
+	            String sql = "SELECT content FROM post WHERE content = ?";
+	            try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+	                pstmt.setString(1, content); 
+	                ResultSet resultSet = pstmt.executeQuery();
+	                
+	                while (resultSet.next()) {
+	                    String post_Id = resultSet.getString("post_id");
+	                    String post_Content = resultSet.getString("content");
+	                    System.out.println("Post ID: " + post_Id + ", Content: " + post_Content);
+	                }
+	            }
+	        } catch (Exception e) {
+	            System.out.println(e.getMessage());
+	        }
+	    }
+
+	 public void comment_Content(String content) {
+	        try (Connection con = getConnection()) {
+	            String sql = "SELECT content FROM comment WHERE content = ?";
+	            try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+	                pstmt.setString(1, content); 
+	                ResultSet resultSet = pstmt.executeQuery();
+
+	                while (resultSet.next()) {
+	                    String comment_Id = resultSet.getString("comment_id");
+	                    String comment_Content = resultSet.getString("content");
+	                    System.out.println("Comment ID: " + comment_Id + ", Content: " + comment_Content);
+	                }
+	            }
+	        } catch (Exception e) {
+	            System.out.println(e.getMessage());
+	        }
+	    }
+	 
 	public void delete(String id, int index) {
 	    PreparedStatement pstmt = null;
 	    ResultSet res = null;

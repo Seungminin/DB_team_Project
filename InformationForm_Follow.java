@@ -1,3 +1,4 @@
+package db_final;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -9,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -176,7 +180,7 @@ public class InformationForm_Follow extends JDialog {
         JPanel PostPanel_type = new JPanel();
         PostPanel_type.setPreferredSize(new Dimension(100,50));
         PostPanel_type.setLayout(new FlowLayout(FlowLayout.LEFT));
-        Post_lb = new JLabel();
+        Post_lb = new JLabel(getPost());
         
         PostPanel_type.add(Post_lb);
         
@@ -283,7 +287,23 @@ public class InformationForm_Follow extends JDialog {
             }
         });
     }
-    
+    public String getPost() {
+    	String postContent = "";
+    	Connection c = Customer.getConnection();
+    	String sql = "SELECT * FROM post WHERE user_id = ?";
+    	try {
+    		PreparedStatement st = c.prepareStatement(sql);
+    		st.setString(1, user_id);
+    		ResultSet rs = st.executeQuery();
+    		if(rs.next())
+    			postContent = rs.getString("content");
+    		System.out.println(postContent);
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    		
+    	return postContent;
+    }
     private void updatePost() {
         Post currentPost = posts.get(index);
         lbimage.setIcon(new ImageIcon(currentPost.getImagePath()));

@@ -1,3 +1,4 @@
+package db_final;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -58,7 +59,7 @@ public class FollowForm extends JDialog implements FollowFormCommon {
     @Override
     public void showInformation(int friendIndex) {
         // friends 배열의 인덱스에 해당하는 친구의 id를 가져옴
-        String friendId = friends[friendIndex];
+        String friendId = Integer.toString(friendIndex);
 
         // 공통 동작 구현
         dispose();  // 현재 다이얼로그 닫기
@@ -151,14 +152,14 @@ public class FollowForm extends JDialog implements FollowFormCommon {
     	view1.addActionListener(new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
-    	    	showInformation(0);
+    	    	showInformation(2);
     	    }
     	});
 
     	view2.addActionListener(new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
-    	    	showInformation(1);
+    	    	showInformation(4);
     	    }
     	});
     	

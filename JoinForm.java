@@ -1,3 +1,4 @@
+package db_final;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -98,7 +99,7 @@ public class JoinForm extends JDialog {
         tfId = new JTextField(tfSize);
         tfPw = new JPasswordField(tfSize);
         tfName = new JTextField(tfSize);
-        tfphone = new JPasswordField(tfSize);
+        tfphone = new JTextField(tfSize);
         tfEmail = new JTextField(tfSize);
         tfbirth = new JTextField(tfSize);
         tfwebsite = new JTextField(tfSize);

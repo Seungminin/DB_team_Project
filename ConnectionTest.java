@@ -1,4 +1,4 @@
-
+package db_final;
 public class ConnectionTest {
 	public static void main(String[] args) {
 		try {

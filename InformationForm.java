@@ -1,3 +1,5 @@
+package db_final;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -13,12 +15,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -26,11 +30,16 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+
+import db_final.Customer;
+import db_final.LoginForm;
+import db_final.InformationForm.ButtonClickListener;
 
 /*
  * //Table 생성
@@ -201,11 +210,16 @@ public class InformationForm extends JDialog {
         
         search = new JTextField();
         search.setHorizontalAlignment(SwingConstants.CENTER);
-        search.setText("\uAC80\uC0C9");
+        //search.setText("\uAC80\uC0C9");
         search.setFont(new Font("나눔고딕", Font.BOLD, 25));
-        search.setBounds(193, 650, 300, 30);
+        search.setBounds(150, 650, 300, 30);
         SearchPanel.add(search);
         search.setColumns(10);
+        
+        // JS:여기 추가
+        JScrollPane scp = new JScrollPane(getPanel());
+        scp.setBounds(150,50,300,550);
+        SearchPanel.add(scp);
         
         cp.add(SearchPanel);
         
@@ -231,7 +245,7 @@ public class InformationForm extends JDialog {
         Follower = new JButton("Follower");
         Following = new JButton("Following");
         
-        p3_search.add(t3_s);
+        //p3_search.add(t3_s);
         p3_search.add(b3_s);
         p3_search.add(Follower);
         p3_search.add(Following);
@@ -258,7 +272,7 @@ public class InformationForm extends JDialog {
         JPanel PostPanel_type = new JPanel();
         PostPanel_type.setPreferredSize(new Dimension(100,50));
         PostPanel_type.setLayout(new FlowLayout(FlowLayout.LEFT));
-        Post_lb = new JLabel();
+        Post_lb = new JLabel(getPost());
         Post_tf = new JTextField(20);
         Post_bt = new JButton("Save");
         
@@ -333,8 +347,10 @@ public class InformationForm extends JDialog {
         });
 
         btnWithdraw.addActionListener(new ActionListener() {
+        	
             @Override
             public void actionPerformed(ActionEvent ae) {
+            	System.out.println(owner.getTfId());
                 customer.withdraw(owner.getTfId());
                 JOptionPane.showMessageDialog(
                         InformationForm.this,
@@ -342,6 +358,7 @@ public class InformationForm extends JDialog {
                 );
                 dispose();
                 owner.setVisible(true);
+                System.exit(0);
             }
         });
         btnLogout.addActionListener(new ActionListener() {
@@ -353,6 +370,7 @@ public class InformationForm extends JDialog {
                 );
                 dispose();
                 owner.setVisible(true);
+                (new LoginForm()).showFrame();
             }
         });
         
@@ -361,6 +379,7 @@ public class InformationForm extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 p2_main.setVisible(!p2_main.isVisible());
                 SearchPanel.setVisible(!SearchPanel.isVisible());
+                getPanel();
             }
         });
 
@@ -453,7 +472,134 @@ public class InformationForm extends JDialog {
             }
         });
     }
-    
+    public String getPost() {
+    	String postContent = "";
+    	Connection c = Customer.getConnection();
+    	String sql = "SELECT * FROM post WHERE user_id = ?";
+    	try {
+    		PreparedStatement st = c.prepareStatement(sql);
+    		st.setString(1, owner.getTfId());
+    		ResultSet rs = st.executeQuery();
+    		if(rs.next())
+    			postContent = rs.getString("content");
+    		System.out.println(postContent);
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    		
+    	return postContent;
+    }
+    public String getComment() {
+    	String postContent = "";
+    	Connection c = Customer.getConnection();
+    	String sql = "SELECT * FROM Comment WHERE user_id = ?";
+    	try {
+    		PreparedStatement st = c.prepareStatement(sql);
+    		st.setString(1, owner.getTfId());
+    		ResultSet rs = st.executeQuery();
+    		if(rs.next())
+    			postContent = rs.getString("content");
+    		System.out.println(postContent);
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    		
+    	return postContent;
+    }
+    static class ButtonClickListener implements ActionListener {
+    	private final JButton button;
+    	private final JTextArea textArea;
+    	private final LoginForm own;
+    	private final String fName;
+        private Connection con = Customer.getConnection();
+        private String isFollow = "SELECT following_id from follow WHERE (follow_id = ? AND following_id LIKE ?)";
+        		
+    	public ButtonClickListener(JButton button,JTextArea textArea, LoginForm owner) {
+            this.button = button;
+            this.textArea = textArea;
+            this.own = owner;
+            this.fName = textArea.getText();
+            String fid = "SELECT user_id FROM customer WHERE name = ?";
+            try {
+            	PreparedStatement s = con.prepareStatement(fid);
+    			s.setNString(1, fName);
+    			ResultSet r1 = s.executeQuery();
+    			if(!r1.next()) throw new Exception();
+    			PreparedStatement st = con.prepareStatement(isFollow);
+    			st.setString(1, own.getTfId());
+    			st.setString(2, r1.getString("user_id"));
+    			ResultSet r = st.executeQuery();
+    			if(r.next())
+    				this.button.setVisible(false);
+    			else
+    				this.button.setVisible(true);
+            }catch(Exception e) {
+            	System.out.println(e);
+            }
+        }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+        		String id = own.getTfId();
+        		String fid = "SELECT user_id FROM customer WHERE name = ?";
+        		String sql = "INSERT INTO follow(follow_id, following_id) values(?,?)";
+        		try {
+        			PreparedStatement s = con.prepareStatement(fid);
+        			s.setNString(1, fName);
+        			ResultSet r1 = s.executeQuery();
+        			// 오류가 발생하면 새로운 익셉션 발생
+        			if(!r1.next()) throw new Exception();
+        				
+        			PreparedStatement st = con.prepareStatement(sql);
+                    st.setString(1, id);
+                    st.setString(2, r1.getString("user_id"));
+                    int r = st.executeUpdate();
+                    if(r == 1)
+                    	System.out.println("success");
+                    else
+                    	System.out.println("fail");
+        		}catch(Exception e1){e1.printStackTrace();}
+        		button.setVisible(false);
+        	}
+        
+    }
+    private JPanel getPanel() {
+    	Connection con = Customer.getConnection();
+    	String val = search.getText();
+    	String sql = String.format("SELECT name FROM customer WHERE user_id != ? and name LIKE ?");
+    	ArrayList<String> d = null;
+    	JPanel mainPanel = new JPanel();
+    	try {
+    		PreparedStatement st = con.prepareStatement(sql);
+    		st.setString(1, owner.getTfId());
+    		st.setString(2, "%" + val + "%");
+    		ResultSet r = st.executeQuery();
+    		d = new ArrayList<>();	
+    		
+    		mainPanel.setBounds(150,50,300,550);
+    		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+    		int c = 0;
+    		while(r.next()) {
+      			System.out.println(r.getString("name") + String.format("C %d",c));
+    			JPanel rowPanel = new JPanel(); // Panel for each row
+    			rowPanel.setBounds(0,50*c,400,100);
+    			rowPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+              
+    			JTextArea textArea = new JTextArea(r.getString("name"));
+    			rowPanel.add(textArea);
+              
+    			JButton btnFollow = new JButton("Follow");
+    			btnFollow.addActionListener(new ButtonClickListener(btnFollow, textArea, owner));
+    		
+    			rowPanel.add(btnFollow);
+    			mainPanel.add(rowPanel);
+    			c++;
+    		}
+    		return mainPanel;
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	return mainPanel;
+    }
  // InformationForm 클래스의 updatePost 메서드 수정
     private void updatePost() {
         Post currentPost = posts.get(index);
@@ -530,11 +676,20 @@ public class InformationForm extends JDialog {
      }
     
     private void insertPostDB(String location, String comment){
+    	String postid = "";
         try 
         (Connection con = Customer.getConnection()) {
+        	String coun = "SELECT COUNT(*) FROM post";
+        	try(PreparedStatement p = con.prepareStatement(coun)){
+        		ResultSet rs = p.executeQuery();
+        		if(rs.next()) {
+        			postid = Integer.toString(rs.getInt(1)+1);
+        		}
+        			
+        	}
             String postquery = "INSERT INTO post (post_id, content, location, user_id) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt = con.prepareStatement(postquery)) {
-            	pstmt.setString(1, getCurrentPostId());
+            	pstmt.setString(1, postid);
                 pstmt.setString(2, Post_tf.getText()); 
                 pstmt.setString(3, location);
                 pstmt.setString(4, getId());
@@ -548,10 +703,11 @@ public class InformationForm extends JDialog {
     	e.printStackTrace();
     }
 }
-
+    
     public void insertCommentDB(String comment) {
         try 
         (Connection con = Customer.getConnection()) {
+        	
             String commentquery = "INSERT INTO comment (comment_id, content, parent_id, user_id, post_id) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = con.prepareStatement(commentquery)) { 
             	

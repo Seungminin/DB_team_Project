@@ -1,7 +1,9 @@
+package db_final;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class Post extends JDialog {
     private InformationForm owner;
@@ -9,7 +11,7 @@ public class Post extends JDialog {
     private JTextArea postContent;
     private JTextField postTitle;
     private JButton postButton;
-    private static List<Post> posts = new ArrayList<>();
+    private static ArrayList<Post> posts = new ArrayList<>();
 
     public Post(InformationForm owner) {
         super(owner, "Post", true);
