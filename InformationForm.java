@@ -492,6 +492,7 @@ public class InformationForm extends JDialog {
     
     public String getId() {
     	return user_id;
+	return owner.getTfId();    
     }
     
     public void setTaCheck(String userInfo) {
