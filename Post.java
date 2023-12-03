@@ -72,8 +72,7 @@ public class Post extends JDialog {
                 } else {
                     Post newPost = new Post(owner);
                     posts.add(newPost);
-                    System.out.println("Posted by " + user_id + ": " + title + "
-" + content);
+                    System.out.println("Posted by " + user_id + ": " + title + "" + content);
                     dispose();
                 }
             }
