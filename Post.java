@@ -14,7 +14,7 @@ public class Post extends JDialog {
     public Post(InformationForm owner) {
         super(owner, "Post", true);
         this.owner = owner;
-        this.user_id = owner.getId();
+        this.user_id = owner.getUserId();
 
         init();
         setDisplay();
