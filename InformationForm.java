@@ -491,8 +491,10 @@ public class InformationForm extends JDialog {
     }
     
     public String getId() {
-    	return user_id;
-	 
+    	return user_id; 
+    }
+	 public String getUserId() {
+        return this.user_id;
     }
     
     public void setTaCheck(String userInfo) {
