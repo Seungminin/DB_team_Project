@@ -1,3 +1,11 @@
+package db_final;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -91,7 +99,7 @@ public class JoinForm extends JDialog {
         tfId = new JTextField(tfSize);
         tfPw = new JPasswordField(tfSize);
         tfName = new JTextField(tfSize);
-        tfphone = new JPasswordField(tfSize);
+        tfphone = new JTextField(tfSize);
         tfEmail = new JTextField(tfSize);
         tfbirth = new JTextField(tfSize);
         tfwebsite = new JTextField(tfSize);
@@ -228,18 +236,12 @@ public class JoinForm extends JDialog {
                                 "Password와 Retry가 일치하지 않습니다."
                         );
                         tfPw.requestFocus();*/
+                        
+                       //모든 data를 잘 넣어줬을 때 회원가입 성공 -> customer db에 저장.
                     } else {
-                    	users.addUsers(new User(
-                    		    tfId.getText(),
-                    		    String.valueOf(tfPw.getPassword()),
-                    		    tfName.getText(),
-                    		    tfphone.getText(),
-                    		    tfEmail.getText(),
-                    		    tfbirth.getText(),
-                    		    tfwebsite.getText(),
-                    		    tfintroduce.getText(),
-                    		    getGender()
-                    		));
+                        joinDB ddbb = new joinDB();
+                        ddbb.run();
+                        
                         JOptionPane.showMessageDialog(
                                 JoinForm.this,
                                 "회원가입을 완료했습니다!"
@@ -301,5 +303,39 @@ public class JoinForm extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
         setVisible(true);
+    }
+
+    /**
+     * joinDB extends Thread
+     */
+    public class joinDB extends Thread {
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+
+            Connection conn = Customer.getConnection();
+            String query = "INSERT INTO customer (user_id, password, name, phone, Email, birth, website, gender, introduction) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+            try {
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                pstmt.setString(1, tfId.getText());
+                pstmt.setString(2, String.valueOf(tfPw.getPassword()));
+                pstmt.setString(3, tfName.getText());
+                pstmt.setString(4, tfphone.getText());
+                pstmt.setString(5, tfEmail.getText());
+                pstmt.setString(6, tfbirth.getText());
+                pstmt.setString(7, tfwebsite.getText());
+                pstmt.setString(8, getGender());
+                pstmt.setString(9, tfintroduce.getText());
+
+                pstmt.executeUpdate();
+                System.out.println("Inserted successfully!");
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+            //super.run();
+        }
+    
+        
     }
 }

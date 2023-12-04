@@ -1,4 +1,6 @@
+package db_final;
 import java.util.ArrayList;
+import java.util.List;
 
 public class UserDataSet {
 	private ArrayList<User> users; //ArrayList로 User를 저장 -> 우리는 서버에다가 

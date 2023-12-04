@@ -1,3 +1,4 @@
+package db_final;
 class User {
 	private String id;
     private String pw;
